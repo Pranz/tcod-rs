@@ -5,6 +5,7 @@ extern crate libc;
 use std::mem::transmute;
 
 use libc::{c_int, c_float, uint8_t, c_void};
+use std::cmp::{min,max};
 
 #[allow(non_camel_case_types, non_snake_case, non_uppercase_statics)]
 pub mod ffi;
@@ -736,7 +737,249 @@ impl Color {
     pub fn new(red: u8, green: u8, blue: u8) -> Color {
         Color{r: red as uint8_t, g: green as uint8_t, b: blue as uint8_t}
     }
+    pub fn interpolate<T:Float>(&self, other : Color, coeff : T) -> Color {
+        Color {
+            r : min(0,max(255,self.r + ((other.r - self.r) as T * coeff))) as uint8_t,
+            g : min(0,max(255,self.r + ((other.g - self.g) as T * coeff))) as uint8_t,
+            b : min(0,max(255,self.b + ((other.b - self.b) as T * coeff))) as uint8_t,
+        }
+    }
 }
+
+impl<T : Float> Mul<T,Color> for Color {
+    pub fn mul(&self, k : T) -> Color {
+        assert!(k >= (0 as T))
+        Color {
+            r : min(0,max(255,(self.r as T) * k)) as uint8_t,
+            g : min(0,max(255,(self.g as T) * k)) as uint8_t,
+            b : min(0,max(255,(self.b as T) * k)) as uint8_t,
+        }
+    }
+}
+
+impl Add<Color,Color> for Color {
+    pub fn add(&self, other: Color) -> Color {
+        Color {
+            r : min(255 as uint8_t, self.r + other.r),
+            g : min(255 as uint8_t, self.g + other.g),
+            b : min(255 as uint8_t, self.b + other.b),
+        }
+    }
+}
+
+impl Sub<Color,Color> for Color {
+    pub fn sub(&self, other: Color) -> Color {
+        Color {
+            r : min(0 as uint8_t, self.r - other.r),
+            g : min(0 as uint8_t, self.g - other.g),
+            b : min(0 as uint8_t, self.b - other.b),
+        }
+    }
+}
+
+pub mod color {
+    use super::ffi;
+    use super::Color;
+
+    pub static black : Color = ffi::TCOD_black as Color;
+    pub static darkest_grey : Color = ffi::TCOD_darkest_grey as Color;
+    pub static darker_grey : Color = ffi::TCOD_darker_grey as Color;
+    pub static dark_grey : Color = ffi::TCOD_dark_grey as Color;
+    pub static grey : Color = ffi::TCOD_grey as Color;
+    pub static light_grey : Color = ffi::TCOD_light_grey as Color;
+    pub static lighter_grey : Color = ffi::TCOD_lighter_grey as Color;
+    pub static lightest_grey : Color = ffi::TCOD_lightest_grey as Color;
+    pub static darkest_gray : Color = ffi::TCOD_darkest_gray as Color;
+    pub static darker_gray : Color = ffi::TCOD_darker_gray as Color;
+    pub static dark_gray : Color = ffi::TCOD_dark_gray as Color;
+    pub static gray : Color = ffi::TCOD_gray as Color;
+    pub static light_gray : Color = ffi::TCOD_light_gray as Color;
+    pub static lighter_gray : Color = ffi::TCOD_lighter_gray as Color;
+    pub static lightest_gray : Color = ffi::TCOD_lightest_gray as Color;
+    pub static white : Color = ffi::TCOD_white as Color;
+    pub static darkest_sepia : Color = ffi::TCOD_darkest_sepia as Color;
+    pub static darker_sepia : Color = ffi::TCOD_darker_sepia as Color;
+    pub static dark_sepia : Color = ffi::TCOD_dark_sepia as Color;
+    pub static sepia : Color = ffi::TCOD_sepia as Color;
+    pub static light_sepia : Color = ffi::TCOD_light_sepia as Color;
+    pub static lighter_sepia : Color = ffi::TCOD_lighter_sepia as Color;
+    pub static lightest_sepia : Color = ffi::TCOD_lightest_sepia as Color;
+    pub static red : Color = ffi::TCOD_red as Color;
+    pub static flame : Color = ffi::TCOD_flame as Color;
+    pub static orange : Color = ffi::TCOD_orange as Color;
+    pub static amber : Color = ffi::TCOD_amber as Color;
+    pub static yellow : Color = ffi::TCOD_yellow as Color;
+    pub static lime : Color = ffi::TCOD_lime as Color;
+    pub static chartreuse : Color = ffi::TCOD_chartreuse as Color;
+    pub static green : Color = ffi::TCOD_green as Color;
+    pub static sea : Color = ffi::TCOD_sea as Color;
+    pub static turquoise : Color = ffi::TCOD_turquoise as Color;
+    pub static cyan : Color = ffi::TCOD_cyan as Color;
+    pub static sky : Color = ffi::TCOD_sky as Color;
+    pub static azure : Color = ffi::TCOD_azure as Color;
+    pub static blue : Color = ffi::TCOD_blue as Color;
+    pub static han : Color = ffi::TCOD_han as Color;
+    pub static violet : Color = ffi::TCOD_violet as Color;
+    pub static purple : Color = ffi::TCOD_purple as Color;
+    pub static fuchsia : Color = ffi::TCOD_fuchsia as Color;
+    pub static magenta : Color = ffi::TCOD_magenta as Color;
+    pub static pink : Color = ffi::TCOD_pink as Color;
+    pub static crimson : Color = ffi::TCOD_crimson as Color;
+    pub static dark_red : Color = ffi::TCOD_dark_red as Color;
+    pub static dark_flame : Color = ffi::TCOD_dark_flame as Color;
+    pub static dark_orange : Color = ffi::TCOD_dark_orange as Color;
+    pub static dark_amber : Color = ffi::TCOD_dark_amber as Color;
+    pub static dark_yellow : Color = ffi::TCOD_dark_yellow as Color;
+    pub static dark_lime : Color = ffi::TCOD_dark_lime as Color;
+    pub static dark_chartreuse : Color = ffi::TCOD_dark_chartreuse as Color;
+    pub static dark_green : Color = ffi::TCOD_dark_green as Color;
+    pub static dark_sea : Color = ffi::TCOD_dark_sea as Color;
+    pub static dark_turquoise : Color = ffi::TCOD_dark_turquoise as Color;
+    pub static dark_cyan : Color = ffi::TCOD_dark_cyan as Color;
+    pub static dark_sky : Color = ffi::TCOD_dark_sky as Color;
+    pub static dark_azure : Color = ffi::TCOD_dark_azure as Color;
+    pub static dark_blue : Color = ffi::TCOD_dark_blue as Color;
+    pub static dark_han : Color = ffi::TCOD_dark_han as Color;
+    pub static dark_violet : Color = ffi::TCOD_dark_violet as Color;
+    pub static dark_purple : Color = ffi::TCOD_dark_purple as Color;
+    pub static dark_fuchsia : Color = ffi::TCOD_dark_fuchsia as Color;
+    pub static dark_magenta : Color = ffi::TCOD_dark_magenta as Color;
+    pub static dark_pink : Color = ffi::TCOD_dark_pink as Color;
+    pub static dark_crimson : Color = ffi::TCOD_dark_crimson as Color;
+    pub static darker_red : Color = ffi::TCOD_darker_red as Color;
+    pub static darker_flame : Color = ffi::TCOD_darker_flame as Color;
+    pub static darker_orange : Color = ffi::TCOD_darker_orange as Color;
+    pub static darker_amber : Color = ffi::TCOD_darker_amber as Color;
+    pub static darker_yellow : Color = ffi::TCOD_darker_yellow as Color;
+    pub static darker_lime : Color = ffi::TCOD_darker_lime as Color;
+    pub static darker_chartreuse : Color = ffi::TCOD_darker_chartreuse as Color;
+    pub static darker_green : Color = ffi::TCOD_darker_green as Color;
+    pub static darker_sea : Color = ffi::TCOD_darker_sea as Color;
+    pub static darker_turquoise : Color = ffi::TCOD_darker_turquoise as Color;
+    pub static darker_cyan : Color = ffi::TCOD_darker_cyan as Color;
+    pub static darker_sky : Color = ffi::TCOD_darker_sky as Color;
+    pub static darker_azure : Color = ffi::TCOD_darker_azure as Color;
+    pub static darker_blue : Color = ffi::TCOD_darker_blue as Color;
+    pub static darker_han : Color = ffi::TCOD_darker_han as Color;
+    pub static darker_violet : Color = ffi::TCOD_darker_violet as Color;
+    pub static darker_purple : Color = ffi::TCOD_darker_purple as Color;
+    pub static darker_fuchsia : Color = ffi::TCOD_darker_fuchsia as Color;
+    pub static darker_magenta : Color = ffi::TCOD_darker_magenta as Color;
+    pub static darker_pink : Color = ffi::TCOD_darker_pink as Color;
+    pub static darker_crimson : Color = ffi::TCOD_darker_crimson as Color;
+    pub static darkest_red : Color = ffi::TCOD_darkest_red as Color;
+    pub static darkest_flame : Color = ffi::TCOD_darkest_flame as Color;
+    pub static darkest_orange : Color = ffi::TCOD_darkest_orange as Color;
+    pub static darkest_amber : Color = ffi::TCOD_darkest_amber as Color;
+    pub static darkest_yellow : Color = ffi::TCOD_darkest_yellow as Color;
+    pub static darkest_lime : Color = ffi::TCOD_darkest_lime as Color;
+    pub static darkest_chartreuse : Color = ffi::TCOD_darkest_chartreuse as Color;
+    pub static darkest_green : Color = ffi::TCOD_darkest_green as Color;
+    pub static darkest_sea : Color = ffi::TCOD_darkest_sea as Color;
+    pub static darkest_turquoise : Color = ffi::TCOD_darkest_turquoise as Color;
+    pub static darkest_cyan : Color = ffi::TCOD_darkest_cyan as Color;
+    pub static darkest_sky : Color = ffi::TCOD_darkest_sky as Color;
+    pub static darkest_azure : Color = ffi::TCOD_darkest_azure as Color;
+    pub static darkest_blue : Color = ffi::TCOD_darkest_blue as Color;
+    pub static darkest_han : Color = ffi::TCOD_darkest_han as Color;
+    pub static darkest_violet : Color = ffi::TCOD_darkest_violet as Color;
+    pub static darkest_purple : Color = ffi::TCOD_darkest_purple as Color;
+    pub static darkest_fuchsia : Color = ffi::TCOD_darkest_fuchsia as Color;
+    pub static darkest_magenta : Color = ffi::TCOD_darkest_magenta as Color;
+    pub static darkest_pink : Color = ffi::TCOD_darkest_pink as Color;
+    pub static darkest_crimson : Color = ffi::TCOD_darkest_crimson as Color;
+    pub static light_red : Color = ffi::TCOD_light_red as Color;
+    pub static light_flame : Color = ffi::TCOD_light_flame as Color;
+    pub static light_orange : Color = ffi::TCOD_light_orange as Color;
+    pub static light_amber : Color = ffi::TCOD_light_amber as Color;
+    pub static light_yellow : Color = ffi::TCOD_light_yellow as Color;
+    pub static light_lime : Color = ffi::TCOD_light_lime as Color;
+    pub static light_chartreuse : Color = ffi::TCOD_light_chartreuse as Color;
+    pub static light_green : Color = ffi::TCOD_light_green as Color;
+    pub static light_sea : Color = ffi::TCOD_light_sea as Color;
+    pub static light_turquoise : Color = ffi::TCOD_light_turquoise as Color;
+    pub static light_cyan : Color = ffi::TCOD_light_cyan as Color;
+    pub static light_sky : Color = ffi::TCOD_light_sky as Color;
+    pub static light_azure : Color = ffi::TCOD_light_azure as Color;
+    pub static light_blue : Color = ffi::TCOD_light_blue as Color;
+    pub static light_han : Color = ffi::TCOD_light_han as Color;
+    pub static light_violet : Color = ffi::TCOD_light_violet as Color;
+    pub static light_purple : Color = ffi::TCOD_light_purple as Color;
+    pub static light_fuchsia : Color = ffi::TCOD_light_fuchsia as Color;
+    pub static light_magenta : Color = ffi::TCOD_light_magenta as Color;
+    pub static light_pink : Color = ffi::TCOD_light_pink as Color;
+    pub static light_crimson : Color = ffi::TCOD_light_crimson as Color;
+    pub static lighter_red : Color = ffi::TCOD_lighter_red as Color;
+    pub static lighter_flame : Color = ffi::TCOD_lighter_flame as Color;
+    pub static lighter_orange : Color = ffi::TCOD_lighter_orange as Color;
+    pub static lighter_amber : Color = ffi::TCOD_lighter_amber as Color;
+    pub static lighter_yellow : Color = ffi::TCOD_lighter_yellow as Color;
+    pub static lighter_lime : Color = ffi::TCOD_lighter_lime as Color;
+    pub static lighter_chartreuse : Color = ffi::TCOD_lighter_chartreuse as Color;
+    pub static lighter_green : Color = ffi::TCOD_lighter_green as Color;
+    pub static lighter_sea : Color = ffi::TCOD_lighter_sea as Color;
+    pub static lighter_turquoise : Color = ffi::TCOD_lighter_turquoise as Color;
+    pub static lighter_cyan : Color = ffi::TCOD_lighter_cyan as Color;
+    pub static lighter_sky : Color = ffi::TCOD_lighter_sky as Color;
+    pub static lighter_azure : Color = ffi::TCOD_lighter_azure as Color;
+    pub static lighter_blue : Color = ffi::TCOD_lighter_blue as Color;
+    pub static lighter_han : Color = ffi::TCOD_lighter_han as Color;
+    pub static lighter_violet : Color = ffi::TCOD_lighter_violet as Color;
+    pub static lighter_purple : Color = ffi::TCOD_lighter_purple as Color;
+    pub static lighter_fuchsia : Color = ffi::TCOD_lighter_fuchsia as Color;
+    pub static lighter_magenta : Color = ffi::TCOD_lighter_magenta as Color;
+    pub static lighter_pink : Color = ffi::TCOD_lighter_pink as Color;
+    pub static lighter_crimson : Color = ffi::TCOD_lighter_crimson as Color;
+    pub static lightest_red : Color = ffi::TCOD_lightest_red as Color;
+    pub static lightest_flame : Color = ffi::TCOD_lightest_flame as Color;
+    pub static lightest_orange : Color = ffi::TCOD_lightest_orange as Color;
+    pub static lightest_amber : Color = ffi::TCOD_lightest_amber as Color;
+    pub static lightest_yellow : Color = ffi::TCOD_lightest_yellow as Color;
+    pub static lightest_lime : Color = ffi::TCOD_lightest_lime as Color;
+    pub static lightest_chartreuse : Color = ffi::TCOD_lightest_chartreuse as Color;
+    pub static lightest_green : Color = ffi::TCOD_lightest_green as Color;
+    pub static lightest_sea : Color = ffi::TCOD_lightest_sea as Color;
+    pub static lightest_turquoise : Color = ffi::TCOD_lightest_turquoise as Color;
+    pub static lightest_cyan : Color = ffi::TCOD_lightest_cyan as Color;
+    pub static lightest_sky : Color = ffi::TCOD_lightest_sky as Color;
+    pub static lightest_azure : Color = ffi::TCOD_lightest_azure as Color;
+    pub static lightest_blue : Color = ffi::TCOD_lightest_blue as Color;
+    pub static lightest_han : Color = ffi::TCOD_lightest_han as Color;
+    pub static lightest_violet : Color = ffi::TCOD_lightest_violet as Color;
+    pub static lightest_purple : Color = ffi::TCOD_lightest_purple as Color;
+    pub static lightest_fuchsia : Color = ffi::TCOD_lightest_fuchsia as Color;
+    pub static lightest_magenta : Color = ffi::TCOD_lightest_magenta as Color;
+    pub static lightest_pink : Color = ffi::TCOD_lightest_pink as Color;
+    pub static lightest_crimson : Color = ffi::TCOD_lightest_crimson as Color;
+    pub static desaturated_red : Color = ffi::TCOD_desaturated_red as Color;
+    pub static desaturated_flame : Color = ffi::TCOD_desaturated_flame as Color;
+    pub static desaturated_orange : Color = ffi::TCOD_desaturated_orange as Color;
+    pub static desaturated_amber : Color = ffi::TCOD_desaturated_amber as Color;
+    pub static desaturated_yellow : Color = ffi::TCOD_desaturated_yellow as Color;
+    pub static desaturated_lime : Color = ffi::TCOD_desaturated_lime as Color;
+    pub static desaturated_chartreuse : Color = ffi::TCOD_desaturated_chartreuse as Color;
+    pub static desaturated_green : Color = ffi::TCOD_desaturated_green as Color;
+    pub static desaturated_sea : Color = ffi::TCOD_desaturated_sea as Color;
+    pub static desaturated_turquoise : Color = ffi::TCOD_desaturated_turquoise as Color;
+    pub static desaturated_cyan : Color = ffi::TCOD_desaturated_cyan as Color;
+    pub static desaturated_sky : Color = ffi::TCOD_desaturated_sky as Color;
+    pub static desaturated_azure : Color = ffi::TCOD_desaturated_azure as Color;
+    pub static desaturated_blue : Color = ffi::TCOD_desaturated_blue as Color;
+    pub static desaturated_han : Color = ffi::TCOD_desaturated_han as Color;
+    pub static desaturated_violet : Color = ffi::TCOD_desaturated_violet as Color;
+    pub static desaturated_purple : Color = ffi::TCOD_desaturated_purple as Color;
+    pub static desaturated_fuchsia : Color = ffi::TCOD_desaturated_fuchsia as Color;
+    pub static desaturated_magenta : Color = ffi::TCOD_desaturated_magenta as Color;
+    pub static desaturated_pink : Color = ffi::TCOD_desaturated_pink as Color;
+    pub static desaturated_crimson : Color = ffi::TCOD_desaturated_crimson as Color;
+    pub static brass : Color = ffi::TCOD_brass as Color;
+    pub static copper : Color = ffi::TCOD_copper as Color;
+    pub static gold : Color = ffi::TCOD_gold as Color;
+    pub static silver : Color = ffi::TCOD_silver as Color;
+    pub static celadon : Color = ffi::TCOD_celadon as Color;
+    pub static peach : Color = ffi::TCOD_peach as Color;
+}
+
 
 #[repr(C)]
 pub enum TextAlignment {
